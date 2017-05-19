@@ -1,0 +1,17 @@
+# dependencies
+/node_modules
+
+# test coverage report, which is generated
+/coverage
+
+# distributable file, which is generated
+/src
+
+# unit tests
+/test
+
+# implementation examples
+/example
+
+# build config
+/rollup.config.js
