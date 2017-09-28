@@ -1,29 +1,35 @@
 'use strict';
 
-// @TODO:
-// <div a /> should encode to ['div', { a: true }] or something, and vice versa
-
 const assert = require('assert');
 const xmlTrident = require('../dist/xml-trident');
 
-const magicKeys = ['xml', 'assert', 'result'];
+// A list of all the keys a test can possibly have to be an it() instead of a describe(). If any of the object
+// properties is not listed here, that test may erronously be recognized as a recursion.
+//
+// Yes, this is a bit shaky but fuck it's only DRYing some tests, man.
+const magicKeys = ['xml', 'assert', 'result', 'skip', 'childNodes'];
+
 function testEverythingInObject (tests) {
 	Object.keys(tests).forEach(name => {
-		if (name.charAt(0) === '_') {
-			return;
-		}
-		describe(name, () => {
-			const test = tests[name];
+		const test = tests[name];
+
+		(test.skip ? xdescribe : describe)(name, () => {
 			if (Object.keys(test).length <= magicKeys.length && Object.keys(test).every(key => magicKeys.includes(key))) {
 				let jsonMl = null;
+				let dom = null;
 
 				it('encodes to JsonML', () => {
 					jsonMl = xmlTrident.toJsonml(test.xml);
 					test.assert(jsonMl);
 				});
 
-				it('encodes to the ' + (test.result ? 'expected' : 'original') + ' XML string', () => {
-					assert.deepEqual(xmlTrident.toString(jsonMl), test.result || test.xml);
+				it('encodes to DOM', () => {
+					dom = xmlTrident.toDom(jsonMl);
+					assert.equal(dom.childNodes.length, test.childNodes === undefined ? 1 : test.childNodes);
+				});
+
+				it('encodes to the ' + (test.result !== undefined ? 'expected' : 'original') + ' XML string', () => {
+					assert.deepEqual(xmlTrident.toString(dom), test.result !== undefined ? test.result : test.xml);
 				});
 			}
 			else {
@@ -33,11 +39,12 @@ function testEverythingInObject (tests) {
 	});
 }
 
-describe('Roundtripping a', () => {
+describe('Roundtripping', () => {
 	testEverythingInObject({
 		'document node': {
 			xml: '',
-			assert: jsonMl => assert.equal(jsonMl[0], '#document')
+			assert: jsonMl => assert.equal(jsonMl[0], '#document'),
+			childNodes: 0
 		},
 		'element node': {
 			'that is self closing': {
@@ -51,7 +58,8 @@ describe('Roundtripping a', () => {
 					a: 'abc',
 					c: '',
 					d: ''
-				}])
+				}]),
+				result: '<div b="123" a="abc" c="" d="" />'
 			},
 			'with children': {
 				xml: '<div><img /></div>',
@@ -59,8 +67,9 @@ describe('Roundtripping a', () => {
 			}
 		},
 		'text node': {
-			xml: 'skeet  boop',
-			assert: jsonMl => assert.equal(jsonMl[1],'skeet  boop')
+			// Wrapping this test in a <span> tag because text is not allowed directly in a DocumentNode
+			xml: '<span>skeet  boop</span>',
+			assert: jsonMl => assert.equal(jsonMl[1][1],'skeet  boop')
 		},
 		'processing instruction': {
 			'without data': {
@@ -77,15 +86,17 @@ describe('Roundtripping a', () => {
 				assert: jsonMl => assert.deepEqual(jsonMl[1],['?pi', 'te  st'])
 			},
 			'with whitespace surrounding data': {
-				xml: '<?pi  te  st ?>',
-				assert: jsonMl => assert.deepEqual(jsonMl[1],['?pi', 'te  st']),
-				result: '<?pi te  st?>'
+				xml: '<?pi    te  st   ?>',
+				assert: jsonMl => assert.deepEqual(jsonMl[1],['?pi', 'te  st   ']),
+				result: '<?pi te  st   ?>',
 			}
 		},
 		'comments': {
 			'without data': {
 				xml: '<!---->',
-				assert: jsonMl => assert.deepEqual(jsonMl[1],['!'])
+				assert: jsonMl => assert.deepEqual(jsonMl[1], undefined),
+				result: '',
+				childNodes: 0
 			},
 			'without data but with spacing': {
 				xml: '<!-- -->',
@@ -118,7 +129,8 @@ describe('Roundtripping a', () => {
 				assert: jsonMl => assert.deepEqual(jsonMl[1],['!DOCTYPE', 'root-element', 'DTD-name', 'DTD-location']),
 				result: '<!DOCTYPE root-element PUBLIC "DTD-name" "DTD-location">',
 			},
-			'_____for private DTDs': {
+			'for private DTDs': {
+				skip: true,
 				xml: '<!DOCTYPE root-element SYSTEM "URI" []>',
 				assert: jsonMl => {
 					console.dir(jsonMl);
@@ -127,8 +139,14 @@ describe('Roundtripping a', () => {
 			}
 		},
 		'cdata': {
+				skip: true,
 				xml: `<![CDATA[ skeet ]]>`,
 				assert: jsonMl => assert.deepEqual(jsonMl[1],['!CDATA', ' skeet '])
 		}
 	});
+});
+
+it('Empty document', () => {
+	assert.equal(xmlTrident.toDom().childNodes.length, 0);
+	assert.equal(xmlTrident.toDom('').childNodes.length, 0);
 });

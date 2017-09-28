@@ -8,7 +8,7 @@ export default {
 	format: 'umd',
 	moduleName: 'xml-trident',
 	globals: {
-		xmldom: 'xmldom'
+		'slimdom-sax-parser': 'slimdom-sax-parser'
 	},
 	plugins: [
 		resolve({

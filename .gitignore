@@ -6,3 +6,5 @@
 
 # distributable file, which is generated
 /dist
+
+package-lock.json

@@ -1,17 +1,9 @@
-import xmldom from 'xmldom';
-
-const domParser = new xmldom.DOMParser();
-
-let emptyDocument;
+import { sync, slimdom } from 'slimdom-sax-parser';
 
 export default function stringToDom (str) {
 	if (str && str.trim().length) {
-		return domParser.parseFromString(str, 'application/xml');
+		return sync(str, true);
 	}
 
-	if (!emptyDocument) {
-		emptyDocument = domParser.parseFromString('<div></div>', 'application/xml').implementation.createDocument();
-	}
-
-	return emptyDocument;
+	return new slimdom.Document();
 }
