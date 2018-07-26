@@ -11,6 +11,9 @@ export default function jsonmlToString (jsonMl) {
 	if (!jsonMl)
 		return '';
 
+	// Make a copy of the JsonML array so we don't accidentially mutate anybody else's data
+	jsonMl = jsonMl.slice();
+	
 	let xmlString = '';
 
 	let nodeName = jsonMl.shift();
