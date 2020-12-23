@@ -2,6 +2,8 @@
 
 > Three-way conversion between XML strings, DOM objects and JSONML representations of a DOM.
 
+**Deprecation warning:** This module is not maintained. Please see [slimdom-sax-parser](https://github.com/wvbe/slimdom-sax-parser) for the DOM parsing, or use the code in [`src/domToJsonml.js`](./src/domToJsonml.js).
+
 ## API
 
 ```

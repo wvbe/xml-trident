@@ -1,36 +1,27 @@
 {
-  "name": "xml-trident",
-  "version": "1.0.2",
-  "description": "Three-way conversion between XML strings, DOM objects and JSONML representations of a DOM.",
-  "repository": "wvbe/xml-trident",
-  "author": {
-    "name": "Wybe Minnebo",
-    "email": "wybe@x-54.com",
-    "url": "https://github.com/wvbe"
-  },
-  "license": "MIT",
-  "homepage": "https://github.com/wvbe/xml-trident",
-  "keywords": [
-    "xml",
-    "stringify",
-    "jsonml"
-  ],
-  "main": "dist/xml-trident.js",
-  "scripts": {
-    "test": "istanbul cover _mocha",
-    "prepublish": "rollup -c rollup.config.js"
-  },
-  "devDependencies": {
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-preset-es2015": "^6.24.1",
-    "istanbul": "^0.4.5",
-    "mocha": "^3.4.1",
-    "rollup": "^0.43.0",
-    "rollup-plugin-babel": "^2.7.1",
-    "rollup-plugin-commonjs": "^8.0.2",
-    "rollup-plugin-node-resolve": "^3.0.0"
-  },
-  "dependencies": {
-    "slimdom-sax-parser": "^1.0.0-rc4"
-  }
+	"name": "xml-trident",
+	"version": "1.0.3",
+	"deprecated": true,
+	"description": "Three-way conversion between XML strings, DOM objects and JSONML representations of a DOM.",
+	"repository": "wvbe/xml-trident",
+	"author": {
+		"name": "Wybe Minnebo",
+		"email": "wybe@x-54.com",
+		"url": "https://github.com/wvbe"
+	},
+	"license": "MIT",
+	"homepage": "https://github.com/wvbe/xml-trident",
+	"keywords": [
+		"xml",
+		"stringify",
+		"jsonml"
+	],
+	"main": "dist/xml-trident.js",
+	"scripts": {
+		"disabled_test": "istanbul cover _mocha",
+		"disabled_prepublish": "rollup -c rollup.config.js"
+	},
+	"dependencies": {
+		"slimdom-sax-parser": "^1.0.0-rc4"
+	}
 }
